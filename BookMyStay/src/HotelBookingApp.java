@@ -1,113 +1,64 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class HotelBookingApp {
 
     public static void main(String[] args) {
 
-        RoomInventory inventory = new RoomInventory();
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
 
-        Map<String, Room> rooms = new HashMap<>();
-        rooms.put("Single", new SingleRoom());
-        rooms.put("Double", new DoubleRoom());
-        rooms.put("Suite", new SuiteRoom());
+        bookingQueue.addRequest(new Reservation("R1", "Koushik", "Single"));
+        bookingQueue.addRequest(new Reservation("R2", "Arun", "Double"));
+        bookingQueue.addRequest(new Reservation("R3", "Rahul", "Suite"));
 
-        SearchService searchService = new SearchService(inventory, rooms);
-
-        searchService.searchAvailableRooms();
+        bookingQueue.displayQueue();
     }
 }
 
-class SearchService {
+class Reservation {
 
-    private RoomInventory inventory;
-    private Map<String, Room> rooms;
+    private String reservationId;
+    private String guestName;
+    private String roomType;
 
-    public SearchService(RoomInventory inventory, Map<String, Room> rooms) {
-        this.inventory = inventory;
-        this.rooms = rooms;
+    public Reservation(String reservationId, String guestName, String roomType) {
+        this.reservationId = reservationId;
+        this.guestName = guestName;
+        this.roomType = roomType;
     }
 
-    public void searchAvailableRooms() {
+    public String getReservationId() {
+        return reservationId;
+    }
 
-        System.out.println("===== AVAILABLE ROOMS =====");
+    public String getGuestName() {
+        return guestName;
+    }
 
-        for (String type : rooms.keySet()) {
-            int available = inventory.getAvailability(type);
+    public String getRoomType() {
+        return roomType;
+    }
+}
 
-            if (available > 0) {
-                Room room = rooms.get(type);
-                room.displayDetails();
-                System.out.println("Available: " + available + "\n");
-            }
+class BookingRequestQueue {
+
+    private Queue<Reservation> queue;
+
+    public BookingRequestQueue() {
+        queue = new LinkedList<>();
+    }
+
+    public void addRequest(Reservation reservation) {
+        queue.add(reservation);
+    }
+
+    public void displayQueue() {
+        System.out.println("===== BOOKING REQUEST QUEUE =====");
+
+        for (Reservation r : queue) {
+            System.out.println("ID: " + r.getReservationId() +
+                    ", Guest: " + r.getGuestName() +
+                    ", Room: " + r.getRoomType());
         }
-    }
-}
-
-class RoomInventory {
-
-    private Map<String, Integer> availability;
-
-    public RoomInventory() {
-        availability = new HashMap<>();
-        availability.put("Single", 5);
-        availability.put("Double", 0);
-        availability.put("Suite", 2);
-    }
-
-    public int getAvailability(String roomType) {
-        return availability.getOrDefault(roomType, 0);
-    }
-}
-
-abstract class Room {
-
-    protected int beds;
-    protected double price;
-
-    public Room(int beds, double price) {
-        this.beds = beds;
-        this.price = price;
-    }
-
-    public abstract void displayDetails();
-}
-
-class SingleRoom extends Room {
-
-    public SingleRoom() {
-        super(1, 2000);
-    }
-
-    public void displayDetails() {
-        System.out.println("Room Type: Single Room");
-        System.out.println("Beds: " + beds);
-        System.out.println("Price: ₹" + price);
-    }
-}
-
-class DoubleRoom extends Room {
-
-    public DoubleRoom() {
-        super(2, 3500);
-    }
-
-    public void displayDetails() {
-        System.out.println("Room Type: Double Room");
-        System.out.println("Beds: " + beds);
-        System.out.println("Price: ₹" + price);
-    }
-}
-
-class SuiteRoom extends Room {
-
-    public SuiteRoom() {
-        super(3, 7000);
-    }
-
-    public void displayDetails() {
-        System.out.println("Room Type: Suite Room");
-        System.out.println("Beds: " + beds);
-        System.out.println("Price: ₹" + price);
     }
 }
